@@ -1,0 +1,577 @@
+@extends('layouts.app')
+
+@section('title', 'Customers')
+
+@section('content')
+
+<style>
+ 
+        :root {
+            --primary-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #06b6d4;
+            --dark-color: #1f2937;
+            --light-bg: #f8fafc;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color), var(--warning-color));
+        }
+
+        /* Success Alert Styling */
+        .alert-success {
+            background: linear-gradient(45deg, #d1fae5, #a7f3d0);
+            border: none;
+            border-left: 5px solid var(--success-color);
+            border-radius: 15px;
+            padding: 20px 25px;
+            color: #065f46;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.15);
+            margin-bottom: 30px;
+        }
+
+        .alert-success i {
+            color: var(--success-color);
+            font-size: 18px;
+        }
+
+        .btn-close {
+            background-size: 16px;
+            opacity: 0.7;
+        }
+
+        /* Top Actions Bar */
+        .top-actions {
+            background: var(--light-bg);
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-container {
+            position: relative;
+            max-width: 350px;
+            flex: 1;
+        }
+
+        .search-input {
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 15px 20px;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            background: white;
+            width: 100%;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+
+        .search-btn {
+            background: var(--primary-color);
+            border: none;
+            border-radius: 12px;
+            padding: 15px 20px;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .search-btn:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-add-customer {
+            background: linear-gradient(45deg, var(--success-color), #059669);
+            border: none;
+            border-radius: 15px;
+            padding: 15px 25px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-add-customer:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+            color: white;
+        }
+
+        /* Table Container */
+        .table-card {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            background: white;
+        }
+
+        .table-header {
+            background: linear-gradient(45deg, var(--light-bg), #f1f5f9);
+            padding: 25px 30px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table-title {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .table {
+            margin: 0;
+            font-size: 15px;
+        }
+
+        .table thead th {
+            background: linear-gradient(45deg, var(--dark-color), #374151);
+            color: white;
+            border: none;
+            padding: 18px 24px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .table thead th i {
+            margin-right: 6px;
+            opacity: 0.9;
+        }
+
+        .table tbody td {
+            padding: 20px 24px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+            font-weight: 500;
+        }
+
+        .table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .table tbody tr:hover {
+            background: linear-gradient(45deg, #f8fafc, #f1f5f9);
+            transform: scale(1.01);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Customer Info Styling */
+        .customer-name {
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 16px;
+        }
+
+        .customer-email {
+            color: var(--info-color);
+            font-weight: 500;
+        }
+
+        .customer-phone {
+            color: var(--dark-color);
+            font-weight: 500;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn-action {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            border: 2px solid;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .btn-view {
+            color: var(--info-color);
+            border-color: var(--info-color);
+            background: rgba(6, 182, 212, 0.1);
+        }
+
+        .btn-view:hover {
+            background: var(--info-color);
+            color: white;
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 5px 15px rgba(6, 182, 212, 0.4);
+        }
+
+        .btn-edit {
+            color: var(--warning-color);
+            border-color: var(--warning-color);
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .btn-edit:hover {
+            background: var(--warning-color);
+            color: white;
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-delete {
+            color: var(--danger-color);
+            border-color: var(--danger-color);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .btn-delete:hover {
+            background: var(--danger-color);
+            color: white;
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+
+        .empty-state i {
+            color: #d1d5db;
+            margin-bottom: 16px;
+        }
+
+        .empty-state-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #374151;
+            margin-top: 12px;
+        }
+
+        /* Pagination */
+        .pagination-wrapper {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .pagination {
+            background: white;
+            border-radius: 15px;
+            padding: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        .page-link {
+            border: none;
+            padding: 12px 16px;
+            margin: 0 2px;
+            border-radius: 8px;
+            color: #6b7280;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .page-link:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .page-item.active .page-link {
+            background: linear-gradient(45deg, var(--primary-color), #2563eb);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Row Number Styling */
+        .row-number {
+            font-weight: 700;
+            color: var(--primary-color);
+            background: rgba(59, 130, 246, 0.1);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .top-actions {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch !important;
+            }
+
+            .search-container {
+                max-width: 100%;
+            }
+
+            .table-responsive {
+                border-radius: 15px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .btn-action {
+                width: 32px;
+                height: 32px;
+                font-size: 12px;
+            }
+        }
+
+        /* Loading Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .table tbody tr {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        /* Custom Scrollbar */
+        .table-responsive::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-responsive::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 10px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: #2563eb;
+        }
+    </style>
+
+
+{{-- Success Message --}}
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
+{{-- Top Actions --}}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <form action="{{ route('customers.index') }}" method="GET" class="d-flex" style="max-width: 300px;">
+        <input type="text" name="search" class="form-control me-2" placeholder="Search customer...">
+        <button class="btn btn-outline-primary"><i class="fas fa-search"></i></button>
+    </form>
+    <a href="{{ route('customers.create') }}" class="btn btn-primary">
+        <i class="fas fa-plus-circle me-1"></i> Add Customer
+    </a>
+</div>
+
+{{-- Customers Table --}}
+  <div class="table-card">
+            <div class="table-header">
+                <h3 class="fw-bold text-primary mb-0">
+                    <i class="fas fa-users"></i>
+                    Customer Directory
+                </h3>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-hashtag"></i> #</th>
+                            <th><i class="fas fa-user"></i> Name</th>
+                            <th><i class="fas fa-envelope"></i> Email</th>
+                            <th><i class="fas fa-phone"></i> Phone</th>
+                            <th class="text-center"><i class="fas fa-cogs"></i> Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($customers as $cust)
+                        <tr>
+                            <td>
+                                <div class="row-number">
+                                    {{ $loop->iteration + ($customers->currentPage()-1)*$customers->perPage() }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="customer-name">{{ $cust->name }}</div>
+                            </td>
+                            <td>
+                                <div class="customer-email">{{ $cust->email }}</div>
+                            </td>
+                            <td>
+                                <div class="customer-phone">{{ $cust->phone }}</div>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{{ route('customers.show', $cust) }}" class="btn-action btn-view" title="View Customer">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ route('customers.edit', $cust) }}" class="btn-action btn-edit" title="Edit Customer">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="{{ route('customers.destroy', $cust) }}" method="POST" style="display:inline-block;" onsubmit="return confirmDelete('{{ $cust->name }}');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="btn-action btn-delete" title="Delete Customer" type="submit">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="5">
+                                <div class="empty-state">
+                                    <i class="fas fa-user-slash fa-3x"></i>
+                                    <div class="empty-state-text">No customers found</div>
+                                    <p class="text-muted mt-2">Start by adding your first customer to the system.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {{-- Pagination --}}
+        <div class="pagination-wrapper">
+            {{ $customers->links('pagination::bootstrap-5') }}
+        </div>
+    </div>
+
+@endsection
+ <script>
+        // Enhanced delete confirmation
+        function confirmDelete(customerName) {
+            return confirm(`⚠️ Are you sure you want to delete "${customerName}"?\n\nThis action cannot be undone and will permanently remove all customer data.`);
+        }
+
+        // Add loading state to buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            // Search form enhancement
+            const searchForm = document.querySelector('form[action*="customers.index"]');
+            const searchInput = document.querySelector('.search-input');
+            const searchBtn = document.querySelector('.search-btn');
+
+            if (searchForm && searchInput && searchBtn) {
+                searchForm.addEventListener('submit', function() {
+                    searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    searchBtn.disabled = true;
+                });
+
+                // Auto-submit search with delay
+                let searchTimeout;
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        if (this.value.length > 2 || this.value.length === 0) {
+                            searchForm.submit();
+                        }
+                    }, 500);
+                });
+            }
+
+            // Delete button loading state
+            document.querySelectorAll('form[method="POST"]').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    const deleteBtn = this.querySelector('.btn-delete');
+                    if (deleteBtn && confirm) {
+                        setTimeout(() => {
+                            deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                            deleteBtn.disabled = true;
+                        }, 100);
+                    }
+                });
+            });
+
+            // Add row animation on page load
+            document.querySelectorAll('tbody tr').forEach((row, index) => {
+                row.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
