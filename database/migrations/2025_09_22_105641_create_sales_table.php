@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('medicine_categories', function (Blueprint $table) {
+        Schema::create('sales', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->unsignedBigInteger('customer_id')->nullable();
+            $table->string('customer_name')->nullable(); // in case customer table is optional
+            $table->decimal('grand_total', 10, 2);
             $table->timestamps();
         });
     }
@@ -23,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('medicine_categories');
+        Schema::dropIfExists('sales');
     }
 };

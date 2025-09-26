@@ -12,6 +12,7 @@ class ProductController extends Controller
     // Show all products
     public function index()
     {
+
         $products = Product::orderBy('id', 'asc')->paginate(5);
          
         return view('products.index', compact('products'));
@@ -28,9 +29,10 @@ class ProductController extends Controller
     // Store product
     public function store(Request $request)
     {
+       
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'category' => 'nullable|string|max:255',
+             'category' => 'required|exists:medicine_categories,id',
             'barcode' => 'nullable|unique:products',
             'purchase_price' => 'required|numeric',
             'selling_price' => 'required|numeric',
@@ -73,6 +75,7 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         $validated = $request->validate([
+               'category' => 'required|exists:medicine_categories,id',
             'purchase_price' => 'required|numeric',
             'selling_price' => 'required|numeric',
             'discount' => 'nullable|numeric',

@@ -10,7 +10,7 @@ class Product extends Model
 
     protected $fillable = [
         'name',
-        'medicine_category_id', // ✅ new FK field
+        'category', // ✅ new FK field
         'barcode',
         'purchase_price',
         'selling_price',
@@ -29,7 +29,7 @@ class Product extends Model
     
     public function medicineCategory()
     {
-        return $this->belongsTo(MedicineCategory::class, 'medicine_category_id');
+        return $this->belongsTo(MedicineCategory::class, 'category');
     }
 }
 

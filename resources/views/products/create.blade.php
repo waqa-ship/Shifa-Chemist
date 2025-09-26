@@ -35,7 +35,7 @@
                         <!-- Product Category -->
                         <div class="col-md-6 mb-3">
                             <label for="medicine_category_id" class="form-label">Product Category</label>
-                            <select class="form-control" id="medicine_category_id" name="medicine_category_id" required>
+                            <select class="form-control" id="medicine_category_id" name="category" required>
                                 <option value="">-- Select Category --</option>
                                 @foreach ($categories as $category)
                                     <option value="{{ $category->id }}"

@@ -2,16 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
+use App\Models\MedicineCategory;
+use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 
 class PosController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+  public function index()
     {
-        return view('pos.index');
+        // Categories
+        $categories = MedicineCategory::orderBy('id', 'asc')->get();
+
+        // Products
+        $products = Product::with('medicineCategory')->get();
+
+        // Customers (same as CustomerController@index)
+        $customers = Customer::orderBy('created_at','desc')->paginate(10);
+
+        return view('pos.index', compact('categories', 'products', 'customers'));
     }
 
     /**
@@ -61,4 +74,5 @@ class PosController extends Controller
     {
         //
     }
+    
 }
