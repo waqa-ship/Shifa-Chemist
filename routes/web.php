@@ -6,6 +6,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -14,16 +15,22 @@ use Illuminate\Support\Facades\Route;
 
 
 
-Route::get('/', function () {
-    return view('dashboard'); // This will load dashboard.blade.php
+
+
+Route::get('/',function(){
+    return view('dashboard');
 });
 
+Route::middleware([
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified',
+])->group(function () {
 Route::resource('customers',CustomerController::class);
 
 
 
-// optionally protect with auth:
-// Route::resource('customers', CustomerController::class)->middleware('auth');
+
 
 
 
@@ -35,3 +42,8 @@ Route::resource('products', ProductController::class);
 
 
 Route::resource('sales', SaleController::class);
+});
+
+
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);                                                                                            
