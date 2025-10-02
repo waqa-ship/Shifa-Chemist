@@ -22,4 +22,17 @@ class AuthController extends Controller
 
         return back()->withErrors(['email' => 'Invalid credentials']);
     }
+        public function logout(Request $request)
+    {
+        // Log out from the guard
+        auth()->guard('web')->logout();
+        
+        // Invalidate the session
+        $request->session()->invalidate();
+        
+        // Regenerate CSRF token
+        $request->session()->regenerateToken();
+        
+        return redirect()->route('login')->with('success', 'You have been logged out successfully.');
+    }
 }
